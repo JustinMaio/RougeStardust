@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"C:\\Projects\\RougeStarDust\\RogueStardust\\Source\\RogueStardust\\RogueStardust.Build.cs",
+		"C:\\Projects\\RougeStarDust\\RogueStardust\\Source\\RogueStardust.Target.cs",
+		"C:\\Projects\\RougeStarDust\\RogueStardust\\Source\\RogueStardustEditor.Target.cs"
+	],
+	"EngineVersion": "5.5.1"
+}

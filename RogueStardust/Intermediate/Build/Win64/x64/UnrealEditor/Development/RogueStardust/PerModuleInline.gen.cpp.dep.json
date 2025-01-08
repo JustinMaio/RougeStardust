@@ -1,0 +1,14 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\projects\\rougestardust\\roguestardust\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\roguestardust\\permoduleinline.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\projects\\rougestardust\\roguestardust\\intermediate\\build\\win64\\x64\\roguestardusteditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "c:\\projects\\rougestardust\\roguestardust\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\roguestardust\\definitions.roguestardust.h",
+            "c:\\program files\\epic games\\ue_5.5\\engine\\source\\runtime\\core\\public\\hal\\permoduleinline.inl"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

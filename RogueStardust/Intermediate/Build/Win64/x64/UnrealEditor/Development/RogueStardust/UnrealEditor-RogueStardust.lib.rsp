@@ -1,0 +1,13 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-RogueStardust.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Projects\RougeStarDust\RogueStardust\Intermediate\Build\Win64\x64\RogueStardustEditor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.obj"
+"C:\Projects\RougeStarDust\RogueStardust\Intermediate\Build\Win64\x64\UnrealEditor\Development\RogueStardust\RogueStardust.cpp.obj"
+"C:\Projects\RougeStarDust\RogueStardust\Intermediate\Build\Win64\x64\UnrealEditor\Development\RogueStardust\PerModuleInline.gen.cpp.obj"
+"C:\Projects\RougeStarDust\RogueStardust\Intermediate\Build\Win64\x64\UnrealEditor\Development\RogueStardust\Default.rc2.res"
+/OUT:"C:\Projects\RougeStarDust\RogueStardust\Intermediate\Build\Win64\x64\UnrealEditor\Development\RogueStardust\UnrealEditor-RogueStardust.lib"

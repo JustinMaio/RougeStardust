@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "RogueStardust",
+			"Path": "..\\Source\\RogueStardust.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "RogueStardustEditor",
+			"Path": "..\\Source\\RogueStardustEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
