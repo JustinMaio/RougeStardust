@@ -1,3 +1,4 @@
+
 # Prerequisites
 *.d
 
@@ -43,6 +44,13 @@
 *.db
 *.ipch
 *.opendb
+*.log
+*.ini
+*.json
+*.old
+*.rsp
+*.vcxproj
+*.filters
 
 # Debug files
 *.dSYM/
@@ -58,3 +66,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+Intermediate/
