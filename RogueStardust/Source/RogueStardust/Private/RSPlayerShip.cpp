@@ -3,6 +3,7 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Camera/CameraComponent.h"
+#include "AbilitySystemComponent.h"
 
 // Sets default values
 ARSPlayerShip::ARSPlayerShip()
@@ -12,8 +13,12 @@ ARSPlayerShip::ARSPlayerShip()
 	// Set this pawn to be controlled by the lowest-numbered player
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
-
-    
+    AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+}
+  
+UAbilitySystemComponent* ARSPlayerShip::GetAbilitySystemComponent() const
+{
+    return AbilitySystemComponent;
 }
 
 // Called when the game starts or when spawned

@@ -4,16 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
 #include "RSPlayerShip.generated.h"
 
+class UAbilitySystemComponent;
+
 UCLASS()
-class ROGUESTARDUST_API ARSPlayerShip : public ACharacter
+class ROGUESTARDUST_API ARSPlayerShip : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	ARSPlayerShip();
+
+	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 
 

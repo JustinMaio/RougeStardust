@@ -11,6 +11,7 @@
     <None Include="..\..\Source\RogueStardustEditor.Target.cs">
       <Filter>Source</Filter>
     </None>
+    <None Include="..\..\.vsconfig" />
     <Filter Include="Config">
       <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
     </Filter>
@@ -32,11 +33,38 @@
     <None Include="..\..\Source\RogueStardust\RogueStardust.Build.cs">
       <Filter>Source\RogueStardust</Filter>
     </None>
+    <None Include="..\..\Source\RogueStardust\RogueStardust.Build.cs.bak">
+      <Filter>Source\RogueStardust</Filter>
+    </None>
     <ClCompile Include="..\..\Source\RogueStardust\RogueStardust.cpp">
       <Filter>Source\RogueStardust</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\RogueStardust\RogueStardust.h">
       <Filter>Source\RogueStardust</Filter>
+    </ClCompile>
+    <Filter Include="Source\RogueStardust\Private">
+      <UniqueIdentifier>{B2AFBD01-1E82-3B23-9883-D39194F5D486}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\RogueStardust\Private\CombatGameMode.cpp">
+      <Filter>Source\RogueStardust\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RogueStardust\Private\RSBaseWeaponComponent.cpp">
+      <Filter>Source\RogueStardust\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RogueStardust\Private\RSPlayerShip.cpp">
+      <Filter>Source\RogueStardust\Private</Filter>
+    </ClCompile>
+    <Filter Include="Source\RogueStardust\Public">
+      <UniqueIdentifier>{C64053F9-DDF7-3CA8-BD82-32E9C97499D8}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\RogueStardust\Public\CombatGameMode.h">
+      <Filter>Source\RogueStardust\Public</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RogueStardust\Public\RSBaseWeaponComponent.h">
+      <Filter>Source\RogueStardust\Public</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RogueStardust\Public\RSPlayerShip.h">
+      <Filter>Source\RogueStardust\Public</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
