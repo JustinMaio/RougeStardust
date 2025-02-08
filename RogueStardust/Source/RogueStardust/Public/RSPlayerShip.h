@@ -33,6 +33,12 @@ protected:
 	void MoveYAxis(float axisValue);
 	void MoveXAxis(float axisValue);
 
+	UPROPERTY(EditAnywhere)
+	class USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(EditAnywhere)
+	class UCameraComponent* CameraComp;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
