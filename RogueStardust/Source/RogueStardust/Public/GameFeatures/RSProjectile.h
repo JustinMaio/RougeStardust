@@ -15,12 +15,21 @@ public:
 	// Sets default values for this actor's properties
 	ARSProjectile();
 
+	virtual void Tick(float DeltaTime) override;
+	void OnProjectileFinished();
+	void InitShotDirection(const FVector& shotDirection);
+	
+	UPROPERTY(EditAnywhere)
+	float ProjectileLifetime = 5.0f;
+
+	UPROPERTY(EditAnywhere)
+	float ProjectileSpeed = 25.0f;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+private:	
 
+	FTimerHandle LifetimeTimerHandle;
 };

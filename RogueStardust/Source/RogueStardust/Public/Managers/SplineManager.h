@@ -4,17 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
+#include "GameFeatures/RSSpline.h"
 #include "SplineManager.generated.h"
 
 class USplineComponent;
-
-UENUM()
-enum ERSSplineType
-{
-	E_PlayerSpline = 0,
-	E_EnemySpline,
-	E_SplineMax
-};
 
 /**
  * 
@@ -28,7 +21,7 @@ public:
 
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const { return true; }
 
-	//making public for now but I'll create an interface later
+	//making public for now but I'll create an interface later also might want to be an array of arrays
 	TMap<ERSSplineType, TObjectPtr<USplineComponent>> SplineMap;
 
 	UFUNCTION(BlueprintCallable)

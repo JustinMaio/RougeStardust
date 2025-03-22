@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#include "RSPlayerShip.h"
+#include "Characters/RSPlayerShip.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Camera/CameraComponent.h"
@@ -10,6 +10,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
+#include "GameFeatures/RSProjectile.h"
+#include "GameFeatures/RSSpline.h"
 
 // Sets default values
 ARSPlayerShip::ARSPlayerShip() : Super()
@@ -23,23 +25,19 @@ ARSPlayerShip::ARSPlayerShip() : Super()
 
     SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
     CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-
+    
     //Attach our components
     GetMesh()->SetupAttachment(RootComponent);
     SpringArmComp->SetupAttachment(GetMesh());
     CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
-
+    
     //Assign SpringArm class variables.
     SpringArmComp->SetRelativeLocationAndRotation(FVector(-10.0f, -10.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
     SpringArmComp->TargetArmLength = 400.f;
     SpringArmComp->bEnableCameraLag = true;
     SpringArmComp->CameraLagSpeed = 3.0f;
 }
-  
-UAbilitySystemComponent* ARSPlayerShip::GetAbilitySystemComponent() const
-{
-    return AbilitySystemComponent;
-}
+ 
 
 // Called when the game starts or when spawned
 void ARSPlayerShip::BeginPlay()
@@ -55,12 +53,26 @@ void ARSPlayerShip::BeginPlay()
     USplineManager* splineMgr = GetWorld()->GetSubsystem<USplineManager>();
     if (splineMgr)
     {
-        USplineComponent* playerSpline = splineMgr->SplineMap[E_PlayerSpline];
+        USplineComponent* playerSpline = splineMgr->SplineMap[ERSSplineType::E_PlayerSpline];
         if (playerSpline)
         {
             levelSpline = playerSpline;
         }
     }
+    TArray<UStaticMeshComponent*> staticMeshArray;
+    this->GetComponents(staticMeshArray, true);
+    for (auto iter = staticMeshArray.begin(); iter != staticMeshArray.end(); ++iter)
+    {
+        if ((*iter))
+        {
+            //Change this later to something more appropiate
+            if ((*iter)->GetName() == "Cube")
+            {
+                MeshComp = (*iter);
+            }
+        }
+    }
+    
     //TEMP CAMERA attache code
     // Create a dummy root component we can attach things to.
     //if (RootComponent == nullptr)
@@ -92,14 +104,14 @@ void ARSPlayerShip::Tick(float DeltaTime)
         splineHeading.Normalize();
         FRotator facing = splineHeading.Rotation();
         SetActorRotation(facing);
+        const FVector UpDirection = this->GetActorUpVector();
+        const FVector RightDirection = this->GetActorRightVector();
         if (SavedModifiedOffset.IsZero())
         {
             SetActorLocation(splinePos);
         }
         else
         {
-            const FVector UpDirection = this->GetActorUpVector();
-            const FVector RightDirection = this->GetActorRightVector();
             FVector UpMod = UpDirection * SavedModifiedOffset.Y;
             FVector RightMod = RightDirection * SavedModifiedOffset.X;
             SetActorLocation(splinePos + UpMod + RightMod);
@@ -109,36 +121,39 @@ void ARSPlayerShip::Tick(float DeltaTime)
 
         if (Controller)
         {
-            const FRotator Rotation = Controller->GetControlRotation();
-            const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-            // get forward vector
-            const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-            const FVector UpDirection = this->GetActorUpVector();
-            const FVector RightDirection = this->GetActorRightVector();
             // get right vector 
-            //const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
             if (!SplineOffset.IsZero())
             {
                 FVector modifiedPos;
-                FVector UpMod = UpDirection * SplineOffset.Z;// *ShipSpeed;// *DeltaTime;
-                FVector RightMod = RightDirection * SplineOffset.Y;// *ShipSpeed;// *DeltaTime;
+                FVector UpMod = UpDirection * SplineOffset.Z;
+                FVector RightMod = RightDirection * SplineOffset.Y;
                 modifiedPos = UpMod + RightMod;
-                FVector modifiedPosOffset = splinePos + (modifiedPos * ShipSpeed);
+                //FVector modifiedPosOffset = splinePos + (modifiedPos * ShipSpeed * DeltaTime);
+                FVector modifiedPosOffset = splinePos + SavedModifiedOffset + (modifiedPos * ShipSpeed * DeltaTime);
                 //do this unless the over the distance away from the spline position
                 double DistFromSpline = FVector::DistSquared(splinePos, modifiedPosOffset);
                 if (DistFromSpline < FMath::Square(MaxOffsetDistance))
                 {
-                    SplineModifiedOffset += (modifiedPos * ShipSpeed);
-                    SavedModifiedOffset.X += SplineOffset.Y * ShipSpeed;
-                    SavedModifiedOffset.Y += SplineOffset.Z * ShipSpeed;
+                    SplineModifiedOffset += (modifiedPos * ShipSpeed * DeltaTime);
+                    SavedModifiedOffset.X += SplineOffset.Y * ShipSpeed * DeltaTime;
+                    SavedModifiedOffset.Y += SplineOffset.Z * ShipSpeed * DeltaTime;
                     FVector newOffsetPos = splinePos + SplineModifiedOffset;
                     SetActorLocation(newOffsetPos);
                     SplineOffset = FVector::ZeroVector;
-                   // SplineModifiedOffset = FVector::ZeroVector;
                 }
             }
         }
+    }
+
+    //Update Roll Reset
+    if (MeshComp && ToOrigRollRate > 0 && ToOrigRollRate < 1.0f)
+    {
+        FRotator curRotation = MeshComp->GetRelativeRotation();
+        double angle = FMath::Lerp(curRotation.Roll, 0, ToOrigRollRate);
+        curRotation.Roll = angle;
+        MeshComp->SetRelativeRotation(curRotation);
+        ToOrigRollRate += RollRate;
+        ToOrigRollRate = FMath::Clamp(ToOrigRollRate, 0.0f, 1.0f);
     }
 
 }
@@ -158,7 +173,11 @@ void ARSPlayerShip::ShootPrimaryWeapon(const FInputActionValue& Value)
         if (ProjectileClass)
         {
             //might need to do some init code here to shoot in the correct direction and speed
-            World->SpawnActor<AActor>(ProjectileClass, spawnLocation);
+            ARSProjectile* projectile = World->SpawnActor<ARSProjectile>(ProjectileClass, spawnLocation);
+            if (projectile)
+            {
+                projectile->InitShotDirection(GetActorForwardVector());
+            }
         }
         //will change it up for charge shot
         TimerManager.SetTimer(ShotDelayHandle, this, &ARSPlayerShip::OnShotDelayDone, shotDelayTime, false);
@@ -212,6 +231,78 @@ void ARSPlayerShip::OnShotDelayDone()
     TimerManager.ClearTimer(ShotDelayHandle);
 }
 
+void ARSPlayerShip::OnDeflectWindowDone()
+{
+    UWorld* World = GetWorld();
+    FTimerManager& TimerManager = World->GetTimerManager();
+    TimerManager.ClearTimer(DeflectDetectionHandle);
+}
+
+void ARSPlayerShip::OnActiveDeflectonDone()
+{
+    UWorld* World = GetWorld();
+    FTimerManager& TimerManager = World->GetTimerManager();
+    TimerManager.ClearTimer(DeflectActiveHandle);
+    //hide the shield object (perhaps make a shield component for other things too)
+}
+
+void ARSPlayerShip::RollPressed(const FInputActionValue& Value)
+{
+    float scalar = Value.Get<float>();
+    scalar = FMath::Clamp(scalar, -1.0, 1.0);
+    if (Controller != nullptr)
+    {
+        if (LastRollStatus < 0 && scalar > 0 ||
+            LastRollStatus > 0 && scalar < 0)
+        {
+            InterpolateRollRate = 0.0f;
+        }
+        LastRollStatus = scalar;
+        //rotate roll by 85-90 degrees roughly
+        //TODO: if swapping between both roll states (negative to postive without letting go) need to handle that edge case
+        if (MeshComp)
+        {
+            ToOrigRollRate = 0.0f;
+            FRotator curRotation = MeshComp->GetRelativeRotation();
+            double angle = FMath::Lerp(curRotation.Roll, scalar * 85.0, InterpolateRollRate);
+            curRotation.Roll = angle;
+            MeshComp->SetRelativeRotation(curRotation);
+            InterpolateRollRate += RollRate;//Might want to factor in Delta time here
+            InterpolateRollRate = FMath::Clamp(InterpolateRollRate, 0.0f, 1.0f);
+        }
+        UWorld* World = GetWorld();
+        FTimerManager& TimerManager = World->GetTimerManager();
+        if (TimerManager.IsTimerActive(DeflectDetectionHandle))
+        {
+            //for now show a shield/sphere or something so we can see it test something else later
+            TimerManager.SetTimer(DeflectActiveHandle, this, &ARSPlayerShip::OnActiveDeflectonDone, DeflectActiveTime, false);
+
+        }
+    }
+}
+
+void ARSPlayerShip::RollReleased(const FInputActionValue& Value)
+{
+    float scalar = Value.Get<float>();
+    scalar = FMath::Clamp(scalar, -1.0, 1.0);
+    if (Controller != nullptr)
+    {
+        InterpolateRollRate = 0.0f;
+        //rotate roll by 85-90 degrees roughly
+        //need to claculate the angle we are currently for roll and interpolate from there
+        if (MeshComp)
+        {
+            ToOrigRollRate += RollRate;
+            ToOrigRollRate = FMath::Clamp(ToOrigRollRate, 0.0f, 1.0f);
+        }
+        //might do this later by frames and not the timer later
+        UWorld* World = GetWorld();
+        FTimerManager& TimerManager = World->GetTimerManager();
+        TimerManager.SetTimer(DeflectDetectionHandle, this, &ARSPlayerShip::OnShotDelayDone, DeflectWindowTime, false);
+
+    }
+}
+
 // Called to bind functionality to input
 void ARSPlayerShip::NotifyControllerChanged()
 {
@@ -236,8 +327,10 @@ void ARSPlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARSPlayerShip::Move);
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ARSPlayerShip::MoveReleased);
 
-
+        //Actions
         EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ARSPlayerShip::ShootPrimaryWeapon);
+        EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &ARSPlayerShip::RollPressed);
+        EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Completed, this, &ARSPlayerShip::RollReleased);
     }
     else
     {

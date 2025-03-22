@@ -2,6 +2,7 @@
 
 
 #include "GameFeatures/RSProjectile.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
 ARSProjectile::ARSProjectile()
@@ -15,7 +16,9 @@ ARSProjectile::ARSProjectile()
 void ARSProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	UWorld* World = GetWorld();
+	FTimerManager& TimerManager = World->GetTimerManager();
+	TimerManager.SetTimer(LifetimeTimerHandle, this, &ARSProjectile::OnProjectileFinished, ProjectileLifetime, false);
 }
 
 // Called every frame
@@ -25,3 +28,15 @@ void ARSProjectile::Tick(float DeltaTime)
 
 }
 
+void ARSProjectile::OnProjectileFinished()
+{
+	Destroy();
+}
+
+void ARSProjectile::InitShotDirection(const FVector& shotDirection)
+{
+	if (UProjectileMovementComponent* projectileMovement = FindComponentByClass<UProjectileMovementComponent>())
+	{
+		projectileMovement->Velocity = shotDirection * projectileMovement->InitialSpeed;
+	}
+}

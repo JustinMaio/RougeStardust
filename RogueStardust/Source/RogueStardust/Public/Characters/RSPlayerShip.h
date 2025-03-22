@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Characters/RSBaseShip.h"
 #include "AbilitySystemInterface.h"
 #include "RSPlayerShip.generated.h"
 
@@ -12,9 +13,11 @@ class USplineComponent;
 class UInputAction;
 struct FInputActionValue;
 class UInputMappingContext;
+class USpringArmComponent;
+class UCameraComponent;
 
 UCLASS()
-class ROGUESTARDUST_API ARSPlayerShip : public ACharacter, public IAbilitySystemInterface
+class ROGUESTARDUST_API ARSPlayerShip : public ARSBaseShip
 {
 	GENERATED_BODY()
 
@@ -22,17 +25,14 @@ public:
 	// Sets default values for this character's properties
 	ARSPlayerShip();
 
-	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
+	UPROPERTY(EditAnywhere)
+	float ShipSpeed = 90.0f;
 
 	UPROPERTY(EditAnywhere)
-	float ShipSpeed = 40.0f;
+	float RollRate = 0.1f;
 
 	UPROPERTY(EditAnywhere)
-	float MaxOffsetDistance = 250.0f;
+	float MaxOffsetDistance = 350.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -42,6 +42,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ShootAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* RollAction;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ProjectileClass;
@@ -57,15 +60,13 @@ protected:
 	void MoveReleased(const FInputActionValue& Value);
 
 	void OnShotDelayDone();
+	void OnDeflectWindowDone();
+	void OnActiveDeflectonDone();
+	void RollPressed(const FInputActionValue& Value);
+	void RollReleased(const FInputActionValue& Value);
 
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(EditAnywhere)
-	class USpringArmComponent* SpringArmComp;
-
-	UPROPERTY(EditAnywhere)
-	class UCameraComponent* CameraComp;
 
 public:	
 	// Called every frame
@@ -73,12 +74,31 @@ public:
 
 private:
 	TObjectPtr<USplineComponent> levelSpline;
-	float splineDist = 0.0f;
+	float splineDist = 25.0f;
 	FVector SplineOffset = FVector::ZeroVector;
 	FVector SplineModifiedOffset = FVector::ZeroVector;
 	FVector SavedModifiedOffset = FVector::ZeroVector;
 
 	float shotDelayTime = 0.2f;
 	FTimerHandle ShotDelayHandle;
+
+	float InterpolateRollRate = 0.0f;
+	float ToOrigRollRate = 0.0f;
+	float LastRollStatus = 0.0f;
+
+	float DeflectWindowTime = 0.5f;
+	float DeflectActiveTime = 1.5f;
+	FTimerHandle DeflectDetectionHandle;
+	FTimerHandle DeflectActiveHandle;
+
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(EditAnywhere)
+	USpringArmComponent* SpringArmComp;
+	
+	UPROPERTY(EditAnywhere)
+	UCameraComponent* CameraComp;
 
 };
