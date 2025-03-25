@@ -21,6 +21,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	float ShipSpeed = 90.0f;
+
 protected:
 
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -31,5 +34,5 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
+	float splineDist = 0.0f;
 };

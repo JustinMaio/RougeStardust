@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "GameFeatures/RSSpline.h"
+#include "GameFeatures/Splines/RSPlayerSpline.h"
 #include "Characters/RSPlayerShip.h"
 #include "Camera/CameraComponent.h"
 #include "Managers/SplineManager.h"
@@ -9,15 +8,15 @@
 #include "Components/SplineComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
-ARSSpline::ARSSpline()
+ARSPlayerSpline::ARSPlayerSpline() : Super()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = true;
+
+    SplineType = ERSSplineType::E_PlayerSpline;
 
     SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
     CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-    SplineComp = CreateDefaultSubobject<USplineComponent>(TEXT("SplineComponent"));
 
     //Attach our components
     //This should actually attach to the spline  and not the ship it feels awkward with it attach directly to the ship
@@ -33,19 +32,12 @@ ARSSpline::ARSSpline()
         SpringArmComp->bEnableCameraLag = true;
         SpringArmComp->CameraLagSpeed = 3.0f;
     }
-
 }
 
 // Called when the game starts or when spawned
-void ARSSpline::BeginPlay()
+void ARSPlayerSpline::BeginPlay()
 {
-	Super::BeginPlay();
-
-    if (USplineManager* splineMgr = GetWorld()->GetSubsystem<USplineManager>())
-    {
-        splineMgr->RegisterSpline(SplineType, SplineComp);
-    }
-	
+    Super::BeginPlay();
 
     if (SplineComp && SplineType == ERSSplineType::E_PlayerSpline)
     {
@@ -62,9 +54,9 @@ void ARSSpline::BeginPlay()
 }
 
 // Called every frame
-void ARSSpline::Tick(float DeltaTime)
+void ARSPlayerSpline::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+    Super::Tick(DeltaTime);
 
     if (SplineComp && SplineType == ERSSplineType::E_PlayerSpline)
     {
@@ -85,4 +77,3 @@ void ARSSpline::Tick(float DeltaTime)
     }
 
 }
-

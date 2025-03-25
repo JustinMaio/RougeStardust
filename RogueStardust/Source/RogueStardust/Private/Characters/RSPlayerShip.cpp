@@ -11,7 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "GameFeatures/RSProjectile.h"
-#include "GameFeatures/RSSpline.h"
+#include "GameFeatures/Splines/RSSpline.h"
 
 // Sets default values
 ARSPlayerShip::ARSPlayerShip() : Super()
@@ -104,8 +104,10 @@ void ARSPlayerShip::Tick(float DeltaTime)
         splineHeading.Normalize();
         FRotator facing = splineHeading.Rotation();
         SetActorRotation(facing);
-        const FVector UpDirection = this->GetActorUpVector();
-        const FVector RightDirection = this->GetActorRightVector();
+         
+        const FVector UpDirection = levelSpline->GetUpVectorAtDistanceAlongSpline(updatedSplineDist, ESplineCoordinateSpace::Local);
+        const FVector RightDirection = levelSpline->GetRightVectorAtDistanceAlongSpline(updatedSplineDist, ESplineCoordinateSpace::Local);
+
         if (SavedModifiedOffset.IsZero())
         {
             SetActorLocation(splinePos);
@@ -121,7 +123,7 @@ void ARSPlayerShip::Tick(float DeltaTime)
 
         if (Controller)
         {
-            // get right vector 
+            // there is a edge case where if we moved to far that we can't accept new input so we'll have to correct that
             if (!SplineOffset.IsZero())
             {
                 FVector modifiedPos;
@@ -138,7 +140,6 @@ void ARSPlayerShip::Tick(float DeltaTime)
                     SavedModifiedOffset.X += SplineOffset.Y * ShipSpeed * DeltaTime;
                     SavedModifiedOffset.Y += SplineOffset.Z * ShipSpeed * DeltaTime;
                     FVector newOffsetPos = splinePos + SplineModifiedOffset;
-                    SetActorLocation(newOffsetPos);
                     SplineOffset = FVector::ZeroVector;
                 }
             }

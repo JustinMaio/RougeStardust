@@ -25,8 +25,8 @@ public:
 	// Sets default values for this character's properties
 	ARSPlayerShip();
 
-	UPROPERTY(EditAnywhere)
-	float ShipSpeed = 90.0f;
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
 	float RollRate = 0.1f;
@@ -68,13 +68,8 @@ protected:
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 private:
 	TObjectPtr<USplineComponent> levelSpline;
-	float splineDist = 25.0f;
 	FVector SplineOffset = FVector::ZeroVector;
 	FVector SplineModifiedOffset = FVector::ZeroVector;
 	FVector SavedModifiedOffset = FVector::ZeroVector;

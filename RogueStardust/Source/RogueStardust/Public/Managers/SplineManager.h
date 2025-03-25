@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "GameFeatures/RSSpline.h"
+#include "GameFeatures/Splines/RSSpline.h"
 #include "SplineManager.generated.h"
 
 class USplineComponent;
